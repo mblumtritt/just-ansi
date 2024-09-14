@@ -1,14 +1,12 @@
 # JustAnsi
 
-<!-- TODO: ![version](https://img.shields.io/gem/v/just-ansi?label=) -->
+![version](https://img.shields.io/gem/v/just-ansi?label=)
 
 Simple and fast ANSI control code processing.
 
-<!-- TODO:
 - Gem: [rubygems.org](https://rubygems.org/gems/just-ansi)
 - Source: [github.com](https://github.com/mblumtritt/just-ansi)
 - Help: [rubydoc.info](https://rubydoc.info/gems/just-ansi/JustAnsi)
--->
 
 ## Installation
 
