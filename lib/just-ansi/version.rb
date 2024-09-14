@@ -2,5 +2,5 @@
 
 module JustAnsi
   # The version number of the gem.
-  VERSION = '0.1.0alpha'
+  VERSION = '0.1.0'
 end
