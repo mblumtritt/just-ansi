@@ -1,0 +1,11 @@
+--title 'just-ansi'
+--charset utf-8
+--markup markdown
+--readme README.md
+--no-private
+--embed-mixins
+--tag comment
+--hide-tag comment
+lib/**/*.rb
+-
+README.md
