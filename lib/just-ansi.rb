@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-# shareable_constant_value: literal
 
 #
 # Simple and fast ANSI control code processing.
