@@ -187,6 +187,50 @@ module JustAnsi
       }m"
     end
 
+    # Replace embedded BBCode-like attributes with ANSI codes.
+    #
+    # @example
+    #   JustAnsi.bbcode "[b]Bold[/b] Text"
+    #   # "\e[1mBold\e[22m Text"
+    #
+    # @param str [#to_s] string to be modified
+    # @return [String] string with ANSI attributes
+    def bbcode(str)
+      str
+        .to_s
+        .gsub(BBCODE) do |match_str|
+          match = Regexp.last_match[1]
+          next "[#{match[1..]}]" if match[0] == '\\'
+          try_convert(match) || match_str
+        end
+    end
+
+    # Remove embedded BBCode-like attributes.
+    #
+    # @example
+    #   JustAnsi.unbbcode "[b]Bold[/b] Text"
+    #   # "Bold Text"
+    #
+    # @param str [#to_s] string to be modified
+    # @return [String] string without BBCode
+    def unbbcode(str)
+      str
+        .to_s
+        .gsub(BBCODE) do |match_str|
+          next match_str if (match = Regexp.last_match[1]).empty?
+          next "[#{match[1..]}]" if match[0] == '\\'
+          next match_str if (match = match.split).empty?
+          next if match.all? { ATTRIBUTES[_1] || COLORS[_1] || _color(_1) }
+          match_str
+        end
+    end
+
+    # Remove any BBCode-like and/or ANSI attributes.
+    #
+    # @param str [#to_s] string to be modified
+    # @return [String] string without BBCode and ANSI control codes.
+    def plain(str) = unbbcode(str).gsub(TEST, '')
+
     # @!group Control functions
 
     # Move cursor given lines up.
@@ -334,7 +378,7 @@ module JustAnsi
     #
     # @param [String] title text
     # @return (see cursor_up)
-    def window_title(title) = "\e]2;#{title}\e\\"
+    def window_title(title) = "\e]2;#{title}\a"
 
     # Change tab title.
     # This is not widely supported.
@@ -345,7 +389,9 @@ module JustAnsi
 
     # Create a hyperlink.
     # This is not widely supported.
-    def link(url, text) = "\e]8;;#{url}\e\\#{text}\e]8;;\e\\"
+    def link(url, text) = "\e]8;;#{url}\a#{text}\e]8;;\a"
+
+    # @comment simple  def notify(title) = "\e]9;#{title}\a"
 
     # @!endgroup
 
@@ -403,15 +449,17 @@ module JustAnsi
   end
 
   TEST =
-    /\e
-      (?:\[[\d;:\?]*[ABCDEFGHJKSTfminsuhl])
+    /
+      (?:\e\[[\d;:\?]*[ABCDEFGHJKSTfminsuhl])
       |
-      (?:\]\d+(?:;[^;\a\e]+)*(?:\a|\e\\))
+      (?:\e\]\d+(?:;[^\a\e]+)*(?:\a|\e\\))
     /x
+
+  BBCODE = /(?:\[((?~[\[\]]))\])/
 
   require_relative 'just-ansi/attributes'
   autoload :NAMED_COLORS, File.join(__dir__, 'just-ansi', 'named_colors')
-  private_constant :TEST, :NAMED_COLORS
+  private_constant :TEST, :BBCODE, :NAMED_COLORS
 
   # @!visibility private
   RESET = self[:reset].freeze
