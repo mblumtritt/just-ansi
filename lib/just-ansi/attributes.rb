@@ -3,6 +3,7 @@
 
 module JustAnsi
   ATTRIBUTES = {
+    '/' => '',
     '/b' => '22',
     '/blink' => '25',
     '/bold' => '22',

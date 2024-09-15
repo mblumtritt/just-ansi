@@ -44,6 +44,7 @@ module AttributesGen
   def self.attributes
     map = {
       'reset' => '',
+      '/' => '',
       # "new underline"
       'curly_underline_off' => '4:0',
       # 'underline' => '4:1',
