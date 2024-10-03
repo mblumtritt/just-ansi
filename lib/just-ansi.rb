@@ -230,6 +230,27 @@ module JustAnsi
     # @return [String] string without BBCode and ANSI control codes.
     def plain(str) = unbbcode(str).gsub(TEST, '')
 
+    # Create nice colored text.
+    #
+    # @param str [#to_s] string to enrich with color
+    # @param frequence [Float] color change frequency
+    # @param spread [Float] number of chars with same color
+    # @param seed [Float] start index on sinus curve
+    # @return [String] fancy text
+    def rainbow(str, frequence: 0.3, spread: 0.8, seed: 1.1)
+      pos = -1
+      str
+        .to_s
+        .chars
+        .map! do |char|
+          i = (seed + ((pos += 1) / spread)) * frequence
+          "\e[38;2;#{(Math.sin(i) * 255).abs.to_i};" \
+            "#{(Math.sin(i + PI2_THIRD) * 255).abs.to_i};" \
+            "#{(Math.sin(i + PI4_THIRD) * 255).abs.to_i}m#{char}"
+        end
+        .join << RESET
+    end
+
     # @!group Control functions
 
     # Move cursor given lines up.
