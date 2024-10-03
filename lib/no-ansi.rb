@@ -3,8 +3,8 @@
 require_relative 'just-ansi'
 
 #
-# Shadow to {JustAnsi} which methods do not use ANSI codes.
-# This can be used as an {JustAnsi} replacement.
+# Shadow to {JustAnsi} but does **not** use ANSI codes.
+# It can be used as a compatible {JustAnsi} replacement.
 #
 # @example Define global Ansi module depending on `NO_COLOR` environment variable
 #   Ansi = ENV.key?('NO_COLOR') ? NoAnsi : JustAnsi
