@@ -236,20 +236,14 @@ RSpec.describe NoAnsi do
   end
 
   context '.window_title' do
-    let(:sample) { 'Hello World!' }
-
-    it 'return copy of given string' do
-      expect(NoAnsi.window_title(sample)).to eq sample
-      expect(NoAnsi.window_title(sample).__id__).not_to eq sample.__id__
+    it 'returns empty string' do
+      expect(NoAnsi.window_title('Sample')).to be_empty
     end
   end
 
   context '.tab_title' do
-    let(:sample) { 'Hello World!' }
-
-    it 'return copy of given string' do
-      expect(NoAnsi.tab_title(sample)).to eq sample
-      expect(NoAnsi.tab_title(sample).__id__).not_to eq sample.__id__
+    it 'returns empty string' do
+      expect(NoAnsi.tab_title('Sample')).to be_empty
     end
   end
 
