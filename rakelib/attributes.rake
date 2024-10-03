@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
-desc 'Build attributes file'
-task 'build:attr' => 'lib/just-ansi/attributes.rb'
+file 'lib/just-ansi/attributes.rb' => 'lib/just-ansi' do |f|
+  generate(f.name, AttributesGen.generate)
+end
+
+directory 'lib/just-ansi'
 
 desc 'Remove attributes file'
 task 'clobber:attr' do
   Rake::Cleaner.cleanup_files(['lib/just-ansi/attributes.rb'])
 end
 
-directory 'lib/just-ansi'
-
-file 'lib/just-ansi/attributes.rb' => 'lib/just-ansi' do |f|
-  generate(f.name, AttributesGen.generate)
-end
+# ensure the file is generated
+task test: 'lib/just-ansi/attributes.rb'
+task doc: 'lib/just-ansi/attributes.rb'
+task build: 'lib/just-ansi/attributes.rb'
 
 module AttributesGen
   def self.generate
