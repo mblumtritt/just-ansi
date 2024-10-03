@@ -2,29 +2,23 @@
 
 RSpec.describe JustAnsi do
   context '.attributes' do
-    subject(:attributes) { JustAnsi.attributes }
-
     it 'returns supported attributes as symbols' do
-      expect(attributes).not_to be_empty
-      expect(attributes).to all be_an Symbol
+      expect(JustAnsi.attributes).not_to be_empty
+      expect(JustAnsi.attributes).to all be_an Symbol
     end
   end
 
   context '.colors' do
-    subject(:colors) { JustAnsi.colors }
-
     it 'returns supported 8-bit-colors as symbols' do
-      expect(colors).not_to be_empty
-      expect(colors).to all be_an Symbol
+      expect(JustAnsi.colors).not_to be_empty
+      expect(JustAnsi.colors).to all be_an Symbol
     end
   end
 
   context '.named_colors' do
-    subject(:named_colors) { JustAnsi.named_colors }
-
     it 'returns supported named colors as symbols' do
-      expect(named_colors).not_to be_empty
-      expect(named_colors).to all be_an Symbol
+      expect(JustAnsi.named_colors).not_to be_empty
+      expect(JustAnsi.named_colors).to all be_an Symbol
     end
   end
 
@@ -38,12 +32,12 @@ RSpec.describe JustAnsi do
     end
 
     it 'supports 3-/4-bit colors' do
-      expect(JustAnsi['red', 'bg_bright_yellow']).to eq "\e[31;103m"
+      expect(JustAnsi['red', :bg_bright_yellow]).to eq "\e[31;103m"
     end
 
     it 'supports 8-bit colors' do
       expect(
-        JustAnsi[0xfa, 'on_ff', 'ul#64']
+        JustAnsi[0xfa, :on_ff, 'ul#64']
       ).to eq "\e[38;5;250;48;5;255;58;5;100m"
 
       expect(JustAnsi[0xfa]).to eq JustAnsi[:fa]
@@ -51,7 +45,7 @@ RSpec.describe JustAnsi do
 
     it 'supports 24-bit colors' do
       expect(
-        JustAnsi['aaa', 'on_aaffee', 'ul#bad']
+        JustAnsi[:aaa, 'on_aaffee', 'ul#bad']
       ).to eq "\e[38;2;170;170;170;48;2;170;255;238;58;2;187;170;221m"
 
       expect(JustAnsi[:abc]).to eq JustAnsi[:aabbcc]
@@ -88,7 +82,7 @@ RSpec.describe JustAnsi do
     end
 
     it 'handles empty argument list' do
-      expect(JustAnsi.valid?()).to be true
+      expect(JustAnsi.valid?).to be true
     end
 
     it 'returns false for for unsupported arguments' do
@@ -163,6 +157,52 @@ RSpec.describe JustAnsi do
     end
   end
 
+  context '.bbcode' do
+    it 'converts valid embedded BBCode' do
+      expect(
+        JustAnsi.bbcode('Hello [b]Ruby[/b] [red]World[/fg]!')
+      ).to eq "Hello \e[1mRuby\e[22m \e[31mWorld\e[39m!"
+    end
+
+    it 'does not convert invalid embedded BBCode' do
+      sample = 'Hello [foo]Ruby[/bar]!'
+      expect(JustAnsi.bbcode(sample)).to eq sample
+    end
+
+    it 'respects escaped BBCode' do
+      expect(
+        JustAnsi.bbcode('Hello [\\b]Ruby[\\/b] [\\red]World[\\/]!')
+      ).to eq 'Hello [b]Ruby[/b] [red]World[/]!'
+    end
+  end
+
+  context '.unbbcode' do
+    it 'removes valid embedded BBCode' do
+      expect(
+        JustAnsi.unbbcode('Hello [b]Ruby[/b] [red]World[/fg]!')
+      ).to eq 'Hello Ruby World!'
+    end
+
+    it 'does not remove invalid embedded BBCode' do
+      sample = 'Hello [foo]Ruby[/bar]!'
+      expect(JustAnsi.unbbcode(sample)).to eq sample
+    end
+
+    it 'respects escaped BBCode' do
+      expect(
+        JustAnsi.unbbcode('Hello [\\b]Ruby[\\/b] [\\red]World[\\/]!')
+      ).to eq 'Hello [b]Ruby[/b] [red]World[/]!'
+    end
+  end
+
+  context '.plain' do
+    it 'removes ANSI control codes and supported BBCodes' do
+      expect(
+        JustAnsi.plain("[b burlywood]Hello[/b]\e[1mWorld!")
+      ).to eq 'HelloWorld!'
+    end
+  end
+
   context '.try_convert' do
     it 'returns String with ANSI control codes for valid attributes' do
       expect(
@@ -184,49 +224,91 @@ RSpec.describe JustAnsi do
     end
   end
 
-  context '.bbcode' do
-    it 'converts valid embedded BBCode' do
-      expect(
-        JustAnsi.bbcode('Hello [b]Ruby[/b] [red]World[/fg]!')
-      ).to eq "Hello \e[1mRuby\e[22m \e[31mWorld\e[39m!"
+  context '.rainbow' do
+    it 'colorizes a given string' do
+      expect(JustAnsi.rainbow('Hello World!')).to eq fixture('rainbow1.ans')
     end
 
-    it 'does not convert invalid embedded BBCode' do
-      sample = 'Hello [foo]Ruby[/bar]!'
-      expect(JustAnsi.bbcode(sample)).to eq sample
+    it 'allows to specify a frequence' do
+      expect(JustAnsi.rainbow('Hello World!', frequence: 1.2)).to eq(
+        fixture('rainbow2.ans')
+      )
     end
 
-    it 'respects escabed BBCode' do
-      expect(
-        JustAnsi.bbcode('Hello [\\b]Ruby[\\/b] [\\red]World[\\/]!')
-      ).to eq 'Hello [b]Ruby[/b] [red]World[/]!'
+    it 'allows to specify the spread' do
+      expect(JustAnsi.rainbow('Hello World!', spread: 1)).to eq(
+        fixture('rainbow3.ans')
+      )
+    end
+
+    it 'allows to specify a seed' do
+      expect(JustAnsi.rainbow('Hello World!', seed: Math::PI)).to eq(
+        fixture('rainbow4.ans')
+      )
     end
   end
 
-  context '.unbbcode' do
-    it 'removes valid embedded BBCode' do
-      expect(
-        JustAnsi.unbbcode('Hello [b]Ruby[/b] [red]World[/fg]!')
-      ).to eq 'Hello Ruby World!'
+  context '.cursor_pos' do
+    it 'returns the code to move the cursor' do
+      expect(JustAnsi.cursor_pos(42, 21)).to eq "\e[42;21H"
     end
 
-    it 'does not remove invalid embedded BBCode' do
-      sample = 'Hello [foo]Ruby[/bar]!'
-      expect(JustAnsi.unbbcode(sample)).to eq sample
+    it 'can just change the row' do
+      expect(JustAnsi.cursor_pos(42)).to eq "\e[42H"
     end
 
-    it 'respects escabed BBCode' do
-      expect(
-        JustAnsi.unbbcode('Hello [\\b]Ruby[\\/b] [\\red]World[\\/]!')
-      ).to eq 'Hello [b]Ruby[/b] [red]World[/]!'
+    it 'can just change the column' do
+      expect(JustAnsi.cursor_pos(nil, 42)).to eq "\e[;42H"
     end
   end
 
-  context '.plain' do
-    it 'removes ANSI control codes and supported BBCodes' do
+  context '.link' do
+    it 'returns the code for a link' do
       expect(
-        JustAnsi.plain("[b burlywood]Hello[/b]\e[1mWorld!")
-      ).to eq 'HelloWorld!'
+        JustAnsi.link('https://some.test?param=%20', 'the text')
+      ).to eq "\e]8;;https://some.test?param=%20\athe text\e]8;;\a"
     end
   end
+
+  context '.window_title' do
+    it 'returns the code to specify the window title' do
+      expect(
+        JustAnsi.window_title('my cool window')
+      ).to eq "\e]2;my cool window\a"
+    end
+  end
+
+  context '.tab_title' do
+    it 'returns the code to specify the tab title' do
+      expect(JustAnsi.tab_title('my cool tab')).to eq "\e]0;my cool tab\a"
+    end
+  end
+
+  context '.cursor_up'
+  context '.cursor_down'
+  context '.cursor_forward'
+  context '.cursor_back'
+  context '.cursor_next_line'
+  context '.cursor_previous_line'
+  context '.cursor_prev_line'
+  context '.cursor_column'
+  context '.cursor_show'
+  context '.cursor_hide'
+  context '.cursor_pos_safe'
+  context '.cursor_pos_restore'
+  context '.screen_erase_below'
+  context '.screen_erase_above'
+  context '.screen_erase'
+  context '.screen_erase_scrollback'
+  context '.screen_save'
+  context '.screen_restore'
+  context '.screen_alternate'
+  context '.screen_alternate_off'
+  context '.line_erase_to_end'
+  context '.line_erase_to_start'
+  context '.line_erase'
+  context '.line_insert'
+  context '.line_delete'
+  context '.scroll_up'
+  context '.scroll_down'
 end
