@@ -381,6 +381,18 @@ module JustAnsi
     # @return (see cursor_up)
     def line_erase = _line_erase(2)
 
+    # Insert given numbers of lines.
+    #
+    # @param (see cursor_up)
+    # @return (see cursor_up)
+    def line_insert(lines = 1) = "\e[#{lines}L"
+
+    # Delete given numbers of lines.
+    #
+    # @param (see cursor_up)
+    # @return (see cursor_up)
+    def line_delete(lines = 1) = "\e[#{lines}M"
+
     # Scroll window given lines up.
     #
     # @param lines [Integer] number of lines to scroll
@@ -411,8 +423,6 @@ module JustAnsi
     # This is not widely supported.
     def link(url, text) = "\e]8;;#{url}\a#{text}\e]8;;\a"
 
-    # @comment simple  def notify(title) = "\e]9;#{title}\a"
-
     # @!endgroup
 
     # @comment seems not widely supported:
@@ -422,10 +432,9 @@ module JustAnsi
     # @comment  def cursor_row_rel(rows = 1) = "\e[#{rows}e"
     # @comment  def cursor_tab(count = 1) = "\e[#{column}I"
     # @comment  def cursor_reverse_tab(count = 1) = "\e[#{count}Z"
-    # @comment  def line_insert(lines = 1) = "\e[#{lines}L"
-    # @comment  def line_delete(lines = 1) = "\e[#{lines}M"
     # @comment  def chars_delete(count = 1) = "\e[#{count}P"
     # @comment  def chars_erase(count = 1) = "\e[#{count}X"
+    # @comment simple  def notify(title) = "\e]9;#{title}\a"
 
     private
 
