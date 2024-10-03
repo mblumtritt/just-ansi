@@ -174,6 +174,19 @@ RSpec.describe JustAnsi do
         JustAnsi.bbcode('Hello [\\b]Ruby[\\/b] [\\red]World[\\/]!')
       ).to eq 'Hello [b]Ruby[/b] [red]World[/]!'
     end
+
+    it 'supports all defined attributes and names' do
+      all = JustAnsi.attributes + JustAnsi.colors + JustAnsi.named_colors
+      text =
+        all
+          .filter_map do |name|
+            next if name[0] == '/'
+            rev = "/#{name}"
+            "#{name}: [#{name}]#{name}[#{all.include?(rev) ? rev : '/'}]"
+          end
+          .join("\n")
+      expect(JustAnsi.bbcode(text)).to eq fixture('bbcodes.ans')
+    end
   end
 
   context '.unbbcode' do
