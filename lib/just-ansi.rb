@@ -486,9 +486,15 @@ module JustAnsi
 
   BBCODE = /(?:\[((?~[\[\]]))\])/
 
+  PI2_THIRD = 2 * Math::PI / 3
+  PI4_THIRD = 4 * Math::PI / 3
+
+  private_constant :TEST, :BBCODE, :PI2_THIRD, :PI4_THIRD
+
   require_relative 'just-ansi/attributes'
+
   autoload :NAMED_COLORS, File.join(__dir__, 'just-ansi', 'named_colors')
-  private_constant :TEST, :BBCODE, :NAMED_COLORS
+  private_constant :NAMED_COLORS
 
   # @!visibility private
   RESET = self[:reset].freeze
