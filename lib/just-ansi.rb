@@ -230,6 +230,27 @@ module JustAnsi
     # @return [String] string without BBCode and ANSI control codes.
     def plain(str) = unbbcode(str).gsub(TEST, '')
 
+    # Create nice colored text.
+    #
+    # @param str [#to_s] string to enrich with color
+    # @param frequence [Float] color change frequency
+    # @param spread [Float] number of chars with same color
+    # @param seed [Float] start index on sinus curve
+    # @return [String] fancy text
+    def rainbow(str, frequence: 0.3, spread: 0.8, seed: 1.1)
+      pos = -1
+      str
+        .to_s
+        .chars
+        .map! do |char|
+          i = (seed + ((pos += 1) / spread)) * frequence
+          "\e[38;2;#{(Math.sin(i) * 255).abs.to_i};" \
+            "#{(Math.sin(i + PI2_THIRD) * 255).abs.to_i};" \
+            "#{(Math.sin(i + PI4_THIRD) * 255).abs.to_i}m#{char}"
+        end
+        .join << RESET
+    end
+
     # @!group Control functions
 
     # Move cursor given lines up.
@@ -360,6 +381,18 @@ module JustAnsi
     # @return (see cursor_up)
     def line_erase = _line_erase(2)
 
+    # Insert given numbers of lines.
+    #
+    # @param (see cursor_up)
+    # @return (see cursor_up)
+    def line_insert(lines = 1) = "\e[#{lines}L"
+
+    # Delete given numbers of lines.
+    #
+    # @param (see cursor_up)
+    # @return (see cursor_up)
+    def line_delete(lines = 1) = "\e[#{lines}M"
+
     # Scroll window given lines up.
     #
     # @param lines [Integer] number of lines to scroll
@@ -390,8 +423,6 @@ module JustAnsi
     # This is not widely supported.
     def link(url, text) = "\e]8;;#{url}\a#{text}\e]8;;\a"
 
-    # @comment simple  def notify(title) = "\e]9;#{title}\a"
-
     # @!endgroup
 
     # @comment seems not widely supported:
@@ -401,10 +432,9 @@ module JustAnsi
     # @comment  def cursor_row_rel(rows = 1) = "\e[#{rows}e"
     # @comment  def cursor_tab(count = 1) = "\e[#{column}I"
     # @comment  def cursor_reverse_tab(count = 1) = "\e[#{count}Z"
-    # @comment  def line_insert(lines = 1) = "\e[#{lines}L"
-    # @comment  def line_delete(lines = 1) = "\e[#{lines}M"
     # @comment  def chars_delete(count = 1) = "\e[#{count}P"
     # @comment  def chars_erase(count = 1) = "\e[#{count}X"
+    # @comment simple  def notify(title) = "\e]9;#{title}\a"
 
     private
 
@@ -456,9 +486,15 @@ module JustAnsi
 
   BBCODE = /(?:\[((?~[\[\]]))\])/
 
+  PI2_THIRD = 2 * Math::PI / 3
+  PI4_THIRD = 4 * Math::PI / 3
+
+  private_constant :TEST, :BBCODE, :PI2_THIRD, :PI4_THIRD
+
   require_relative 'just-ansi/attributes'
+
   autoload :NAMED_COLORS, File.join(__dir__, 'just-ansi', 'named_colors')
-  private_constant :TEST, :BBCODE, :NAMED_COLORS
+  private_constant :NAMED_COLORS
 
   # @!visibility private
   RESET = self[:reset].freeze
