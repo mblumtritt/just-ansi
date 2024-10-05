@@ -7,7 +7,9 @@ Gem::Specification.new do |spec|
   spec.version = JustAnsi::VERSION
   spec.summary = 'Simple fast ANSI'
   spec.description = <<~DESCRIPTION
-    Simple and fast ANSI control code processing.
+    JustAnsi provides a rich set of methods to generate ANSI control codes for
+    attributes, colors, cursor movement and much more. It supports most control
+    codes, all attributes, 3/4bit-, 8bit- and 24bit-colors.
   DESCRIPTION
 
   spec.author = 'Mike Blumtritt'
