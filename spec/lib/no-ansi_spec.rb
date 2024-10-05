@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 RSpec.describe NoAnsi do
+  it 'implements same method set as JustAnsi' do
+    expect(NoAnsi.methods.sort).to eq JustAnsi.methods.sort
+  end
+
+  it 'implements same constants as JustAnsi' do
+    expect(NoAnsi.constants.sort).to eq JustAnsi.constants.sort
+  end
+
   context '.attributes' do
     it 'returns JustAnsi attributes' do
       expect(NoAnsi.attributes).to eq JustAnsi.attributes
